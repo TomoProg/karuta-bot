@@ -68,26 +68,29 @@ def main():
         logger.write(str(e))
         sys.exit(1)
 
+    #-------------------------------------------------------------
     # 初回起動メッセージをつぶやく
-    try:
-        tweet_time = datetime.datetime.now()
-        tweet_msg = """
-                    karuta_bot.pyが起動したよ!!\n
-                    これから5分毎に百人一首をつぶやくよ!!
-                    """
-        app.statuses.update(status=tweet_msg)
-    except Exception as e:
-        logger.write("初回起動メッセージのつぶやきに失敗しました。")
-        logger.write(str(e))
-        sys.exit(1)
+    #-------------------------------------------------------------
+    #try:
+    #    tweet_time = datetime.datetime.now()
+    #    tweet_msg = """
+    #                karuta_bot.pyが起動したよ!!\n
+    #                これから5分毎に百人一首をつぶやくよ!!
+    #                """
+    #    app.statuses.update(status=tweet_msg)
+    #except Exception as e:
+    #    logger.write("初回起動メッセージのつぶやきに失敗しました。")
+    #    logger.write(str(e))
+    #    sys.exit(1)
 
     #-------------------------------------------------------------
-    # つぶやく（とりあえず5分ごとにつぶやく）
+    # つぶやく（とりあえず10分ごとにつぶやく）
     #-------------------------------------------------------------
+    tweet_time = datetime.datetime(1900, 1, 1, 0, 0, 0)
     tweet_karuta_list = copy.deepcopy(karuta_info)
     while True:
         now_time = datetime.datetime.now()
-        if int((now_time - tweet_time).seconds / 300) >= 1:
+        if int((now_time - tweet_time).seconds / 600) >= 1:
             idx = random.randint(0, len(tweet_karuta_list) - 1)
             if karuta_tweet(tweet_karuta_list[idx]):
                 tweet_karuta_list.pop(idx)
