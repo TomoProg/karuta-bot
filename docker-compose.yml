@@ -1,0 +1,9 @@
+version: '2'
+
+services:
+  python:
+    build: ./
+    container_name: karuta_bot
+    volumes:
+      - ./app:/app
+    tty: true
