@@ -1,6 +1,5 @@
 #-*- coding:utf-8 -*-
-
-from twitter import *
+from twitter import * # GitHub: https://github.com/sixohsix/twitter
 import json
 import datetime
 import time
@@ -10,7 +9,9 @@ import os
 import logger
 import sys
 
+#-------------------------------------------------------------
 # global変数
+#-------------------------------------------------------------
 app = None
 app_up = None
 app_auth = None
@@ -19,10 +20,7 @@ karuta_info_file_name = "karuta_info.json"
 logger = logger.Logger(__file__ + ".log")
 
 def main():
-    """
-        Content:
-            エントリーポイント
-    """
+    """ main """
 
     global app
     global app_up
@@ -30,7 +28,9 @@ def main():
     global conf_file_name
     global karuta_info_file_name
 
+    #-------------------------------------------------------------
     # 設定ファイル読み込み
+    #-------------------------------------------------------------
     try:
         with open(conf_file_name) as f:
             conf_data = json.loads(f.read())
@@ -39,7 +39,9 @@ def main():
         logger.write(str(e))
         sys.exit(1)
 
+    #-------------------------------------------------------------
     # Twitterアプリ認証
+    #-------------------------------------------------------------
     try:
         app_auth = OAuth(
             conf_data["access_token"],
@@ -53,7 +55,9 @@ def main():
         logger.write(str(e))
         sys.exit(1)
 
+    #-------------------------------------------------------------
     # 百人一首ファイル読み込み
+    #-------------------------------------------------------------
     try:
         karuta_info = []
         with open(karuta_info_file_name) as f:
@@ -77,7 +81,9 @@ def main():
         logger.write(str(e))
         sys.exit(1)
 
-    # 10分毎につぶやく
+    #-------------------------------------------------------------
+    # つぶやく（とりあえず5分ごとにつぶやく）
+    #-------------------------------------------------------------
     tweet_karuta_list = copy.deepcopy(karuta_info)
     while True:
         now_time = datetime.datetime.now()
@@ -91,18 +97,14 @@ def main():
         time.sleep(10)
 
 def karuta_tweet(karuta_info):
-    """
-        Content:
-            つぶやく
-    """
+    """ つぶやく """
 
     global app
     global app_up
 
-    #------------------------------
-    # かるた画像つぶやき
-    #------------------------------
-    # 画像ファイル読み込み
+    #-------------------------------------------------------------
+    # かるた画像ファイル読み込み
+    #-------------------------------------------------------------
     try:
         file_path = os.path.join("./karuta_img/", karuta_info["img"])
         with open(file_path, "rb") as image_f:
@@ -112,14 +114,17 @@ def karuta_tweet(karuta_info):
         logger.write(str(e))
         return False
 
-
-    # つぶやきメッセージ作成
+    #-------------------------------------------------------------
+    # 原文ツイート作成
+    #-------------------------------------------------------------
     tweet_msg = (
         karuta_info["first_part"] + "\n" +
         karuta_info["last_part"] + "\n" +
         karuta_info["name"])
 
-    # つぶやく
+    #-------------------------------------------------------------
+    # 原文をつぶやく
+    #-------------------------------------------------------------
     try:
         id_img = app_up.media.upload(media=image_data)["media_id_string"]
         app.statuses.update(status=tweet_msg, media_ids=id_img)
@@ -128,11 +133,15 @@ def karuta_tweet(karuta_info):
         logger.write(str(e))
         return False
 
-    time.sleep(30)
+    #-------------------------------------------------------------
+    # 連続でツイートすることができないため、
+    # 一定時間スリープする
+    #-------------------------------------------------------------
+    time.sleep(300)
 
-    #------------------------------
-    # 日本語訳つぶやき
-    #------------------------------
+    #-------------------------------------------------------------
+    # 日本語訳をツイート
+    #-------------------------------------------------------------
     tweet_msg = karuta_info["translate"]
     try:
         app.statuses.update(status=tweet_msg)
