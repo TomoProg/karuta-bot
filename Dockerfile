@@ -4,4 +4,5 @@ RUN apt-get update && apt-get install -y \
     vim-tiny
 RUN pip install --upgrade pip
 RUN pip install twitter
+RUN pip install slackweb
 WORKDIR /app
